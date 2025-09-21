@@ -32,6 +32,21 @@ inline void fill_with_index(float* p, int n, int gpu) {
   for (int i = 0; i < n; ++i) h[i] = gpu*1000.0f + i;
   CHECK_CUDA(cudaMemcpy(p, h.data(), n*sizeof(float), cudaMemcpyHostToDevice));
 }
+#pragma once
+__global__ void sgemm_naive(int M, int N, int K,
+                            const float* __restrict__ A,
+                            const float* __restrict__ B,
+                            float* __restrict__ C) {
+  int row = blockIdx.y * blockDim.y + threadIdx.y; // [0..M)
+  int col = blockIdx.x * blockDim.x + threadIdx.x; // [0..N)
+  if (row < M && col < N) {
+    float acc = 0.f;
+    for (int k = 0; k < K; ++k) {
+      acc += A[row*K + k] * B[k*N + col];
+    }
+    C[row*N + col] = acc;
+  }
+}
 int main() {
   const int world = 8;
   int devs[world]; for (int i=0;i<world;++i) devs[i]=i;
