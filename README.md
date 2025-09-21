@@ -1,2 +1,2 @@
 # GPU-Kernals 
-This repoistory will contain submissions for ADM GPU Kernal Hackaton 
+This repoistory will contain submissions for AMD Developer Challege 2025 Kernel hackathon.
