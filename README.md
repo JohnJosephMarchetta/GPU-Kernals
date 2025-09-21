@@ -1,2 +1,4 @@
 # GPU-Kernals 
-This repoistory will contain submissions for AMD Developer Challege 2025 Kernel hackathon.
+This repoistory contains samples of GPU kernals for the AMD Developer Challege Distributed Inference Kernels
+ hackathon 2025.
+ 
