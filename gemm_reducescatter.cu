@@ -4,23 +4,22 @@
 #include <cuda_runtime.h>
 #include <nccl.h>
 
-#define CHECK_CUDA(call) do {                                 
-  cudaError_t _e = (call);                                     
-  if (_e != cudaSuccess) {                                     
-    fprintf(stderr, "CUDA %s:%d: %s\n", __FILE__, __LINE__,    
-            cudaGetErrorString(_e));                           
-    std::exit(1);                                              
-  }                                                            
+#define CHECK_CUDA(call) do {                                 \
+  cudaError_t _e = (call);                                     \
+  if (_e != cudaSuccess) {                                     \
+    fprintf(stderr, "CUDA %s:%d: %s\n", __FILE__, __LINE__,    \
+            cudaGetErrorString(_e));                           \
+    std::exit(1);                                              \
+  }                                                            \
 } while(0)
 
-#define CHECK_NCCL(call) do {                                  
-  ncclResult_t _e = (call);                                     
-  if (_e != ncclSuccess) {                                     
-    fprintf(stderr, "NCCL %s:%d: %s\n", __FILE__, __LINE__,    
-            ncclGetErrorString(_e));                           
-    std::exit(1);                                              
-  }                            
-                                
+#define CHECK_NCCL(call) do {                                  \
+  ncclResult_t _e = (call);                                     \
+  if (_e != ncclSuccess) {                                     \
+    fprintf(stderr, "NCCL %s:%d: %s\n", __FILE__, __LINE__,    \
+            ncclGetErrorString(_e));                           \
+    std::exit(1);                                              \
+  }                                                            \
 } while(0)
 
 inline void fill_with_index(float* p, int n, int gpu) {
@@ -29,7 +28,9 @@ inline void fill_with_index(float* p, int n, int gpu) {
   for (int i = 0; i < n; ++i) h[i] = gpu*1000.0f + i;
   CHECK_CUDA(cudaMemcpy(p, h.data(), n*sizeof(float), cudaMemcpyHostToDevice));
 }
+
 #pragma once
+
 __global__ void sgemm_naive(int M, int N, int K,
                             const float* __restrict__ A,
                             const float* __restrict__ B,
@@ -44,6 +45,12 @@ __global__ void sgemm_naive(int M, int N, int K,
     C[row*N + col] = acc;
   }
 }
+
+// gemm_reducescatter.cu
+#include <vector>
+#include "helpers.h"
+#include "sgemm_naive.cuh"
+
 int main() {
   const int world = 8;
   int devs[world]; for (int i=0;i<world;++i) devs[i]=i;
