@@ -49,14 +49,14 @@ int main() {
   ncclComm_t comms[world];
   CHECK_NCCL(ncclCommInitAll(comms, world, devs));
 
-  // Sizes
+  #Sizes
   const int M = 1024, K = 512, N = 1024;
   const int n_per_rank = N / world;             // shard columns of B
 
   cudaStream_t streams[world];
   float *Arows[world], *Bshard[world], *Ball[world], *C[world];
 
-  // Each rank keeps some subset of A rows too (optional). Here everyone has full A for simplicity.
+  #Each rank keeps some subset of A rows too (optional). Here everyone has full A for simplicity.
   for (int r=0;r<world;++r) {
     CHECK_CUDA(cudaSetDevice(r));
     CHECK_CUDA(cudaStreamCreate(&streams[r]));
@@ -68,14 +68,14 @@ int main() {
     fill_with_index(Bshard[r], K*n_per_rank, r);
   }
 
-  // AllGather B shards -> Ball (concatenate along columns)
+  #AllGather B shards -> Ball (concatenate along columns)
   for (int r=0;r<world;++r) {
     CHECK_CUDA(cudaSetDevice(r));
     CHECK_NCCL(ncclAllGather(Bshard[r], Ball[r], K*n_per_rank, ncclFloat,
                              comms[r], streams[r]));
   }
 
-  // GEMM with full B per rank (naive)
+  #\GEMM with full B per rank (naive)
   dim3 block(16,16);
   dim3 grid((N+block.x-1)/block.x, (M+block.y-1)/block.y);
   for (int r=0;r<world;++r) {
