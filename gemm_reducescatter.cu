@@ -1,7 +1,4 @@
 #include <vector>
-#include "helpers.h"
-#include "sgemm_naive.cuh"
-#pragma once
 #include <cstdio>
 #include <cstdlib>
 #include <cuda_runtime.h>
